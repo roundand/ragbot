@@ -6,6 +6,13 @@ from langchain.prompts import (
     HumanMessagePromptTemplate,
     ChatPromptTemplate,
 )
+from langchain_core.output_parsers import StrOutputParser
+from langchain_community.vectorstores import Chroma
+from langchain_openai import OpenAIEmbeddings
+from langchain.schema.runnable import RunnablePassthrough
+
+REVIEWS_CHROMA_PATH = "chroma_data/"
+
 
 dotenv.load_dotenv()
 
@@ -41,4 +48,18 @@ review_prompt_template = ChatPromptTemplate(
 
 chat_model = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
 
-review_chain = review_prompt_template | chat_model
+output_parser  = StrOutputParser()
+
+reviews_vector_db = Chroma(
+    persist_directory=REVIEWS_CHROMA_PATH,
+    embedding_function=OpenAIEmbeddings()
+)
+
+reviews_retriever  = reviews_vector_db.as_retriever(k=10)
+
+review_chain = (
+    {"context": reviews_retriever, "question": RunnablePassthrough()}
+    | review_prompt_template 
+    | chat_model 
+    | output_parser
+)
