@@ -14,7 +14,7 @@ PS> venv\Scripts\activate
 ```
 
 ### To install dependencies, in Windows (one-off, or any time you merge an updated requirements.txt)
-```pip install -r requirements.txt```
+```(venv) PS> pip install -r requirements.txt```
 
 ### To update requirements.txt (any time you've added or updated a dependency)
-```pip freeze > requirements.txt```
+```(venv) PS> pip freeze > requirements.txt```
